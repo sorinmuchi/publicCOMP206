@@ -1,0 +1,1 @@
+finger `users | tr ' ' '\n' | grep '[bB]ob`
