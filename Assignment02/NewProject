@@ -1,0 +1,68 @@
+#!/bin/bash
+
+#checking input
+if [[ -z $1 ]]
+	then
+		echo "Project name is missing. Type in: NewProject project_name"
+		exit 1
+fi
+
+if [[ -n $2 ]]
+	then
+		echo "Your project name must be a single word. Type in: NewProject project_name"
+		exit 1
+fi
+
+slash=`echo $1 | grep -o /`
+if [[ -n $slash ]]
+	then
+		echo "Project name should not have a path"
+		exit 1
+fi
+
+#creating best practices directory structure
+
+mkdir $1 $1/docs $1/source $1/backup $1/archive
+
+#create compile file
+touch $1/source/compile
+echo "#!/bin/bash
+
+#variables
+executable=\"\"
+
+#check if -o switch is present
+if [ \$1 = \"-o\" ];
+	then
+		executable=\$2
+		shift
+		shift
+fi
+
+#check if at least one input file to be compiled is present
+if [ -z \$0 ]
+	then
+	echo \"You are missing file names. Type in: compile -o executable file(s)\"
+	exit 1
+fi
+
+#copy all files into backup subdirectory
+
+cp -f * ../backup
+cp -f .* ../backup
+
+
+#compiling with 
+if [ -z \$executable ]
+	then
+	gcc \$* &> errors
+else
+	gcc -o \$executable \$* &> errors
+fi
+
+more errors">$1/source/compile
+
+chmod 755 $1/source/compile
+
+echo "New Project Created."
+
